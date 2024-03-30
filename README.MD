@@ -5,6 +5,7 @@ This is the API of ABMODEL course platform.
 # Pre-requisites
 
 - [Python 3.11+](https://www.python.org/downloads/)
+- [PostgreSQL](https://www.postgresql.org/)
 
 # Installation
 
@@ -39,7 +40,7 @@ pyenv virtualenv 3.11.8 abmodel
 pip install -r requirements.txt
 ```
 
-## Database configuration
+## Database configuration (PostgreSQL)
 * Copy .env.example to .env
 * Set env variables in .env
 ```properties
@@ -47,7 +48,7 @@ DB_USER=your_username
 DB_PASS=your_password
 DB_NAME=your_dbname
 DB_HOST=localhost # or your db host for example: domain-db.com
-DB_PORT=3306
+DB_PORT=5432
 ```
 
 ## Run migrations

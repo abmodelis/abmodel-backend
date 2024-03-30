@@ -44,6 +44,8 @@ line-length = 120
 
 [tool.pylint]
 
+
+max-line-length = 120
 disable = [
     'raw-checker-failed',
     'bad-inline-option',
