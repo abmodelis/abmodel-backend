@@ -1,12 +1,12 @@
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+
+from pydantic import BaseModel
 
 from .unit import Unit
 
 
-@dataclass
-class Content:
+class Content(BaseModel):
     id: int
     title: str
     html_text: str

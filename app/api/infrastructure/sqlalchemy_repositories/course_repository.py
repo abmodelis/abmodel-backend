@@ -1,5 +1,3 @@
-from typing import TypeVar
-
 from fastapi import Depends
 from pydantic import TypeAdapter
 from sqlalchemy.orm import Session
@@ -10,12 +8,9 @@ from app.core.domain.course import Course
 from app.core.use_cases.courses.schemas import CourseIn
 from app.databases.sqlalchemy_connection.models.course_db import CourseDB
 
-ModelDB = TypeVar("ModelDB")
-
 
 class CourseRepository(Repository[CourseIn, Course]):
     def __init__(self, db: Session = Depends(get_db)) -> None:
-        print(db)
         self.db = db
 
     def create(self, entity):
@@ -23,6 +18,7 @@ class CourseRepository(Repository[CourseIn, Course]):
         self.db.add(new_course)
         self.db.commit()
         self.db.refresh(new_course)
+        print(new_course)
         return TypeAdapter(Course).validate_python(new_course)
 
     def get_all(self):

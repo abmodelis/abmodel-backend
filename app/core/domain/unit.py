@@ -1,11 +1,11 @@
-from dataclasses import dataclass
 from typing import Optional
+
+from pydantic import BaseModel
 
 from .course import Course
 
 
-@dataclass
-class Unit:
+class Unit(BaseModel):
     id: int
     title: str
     description: str

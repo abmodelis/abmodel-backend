@@ -1,13 +1,13 @@
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+
+from pydantic import BaseModel
 
 from .course import Course
 from .user import User
 
 
-@dataclass
-class Registration:
+class Registration(BaseModel):
     id: int
     user: Optional[User]
     course: Optional[Course]

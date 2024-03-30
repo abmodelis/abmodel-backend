@@ -1,13 +1,13 @@
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+
+from pydantic import BaseModel
 
 from .content import Content
 from .registration import Registration
 
 
-@dataclass
-class ContentView:
+class ContentView(BaseModel):
     id: int
     registration: Optional[Registration]
     content: Optional[Content]
