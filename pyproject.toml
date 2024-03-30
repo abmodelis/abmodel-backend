@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+
+follow_imports = "normal"
+warn_redundant_casts = true
+warn_unused_ignores = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+
+disable_error_code = ['assignment', 'call-arg']
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    "_pytest.*",
+    "_string",
+    "astroid.*",
+    # `colorama` ignore is needed for Windows environment
+    "colorama",
+    "contributors_txt",
+    "coverage",
+    "dill",
+    "enchant.*",
+    "git.*",
+    "mccabe",
+    "pytest_benchmark.*",
+    "pytest",
+    "sphinx.*",
+]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.black]
+line-length = 120
+
+[tool.pylint]
+
+disable = [
+    'raw-checker-failed',
+    'bad-inline-option',
+    'locally-disabled',
+    'file-ignored',
+    'suppressed-message',
+    'useless-suppression',
+    'deprecated-pragma',
+    'use-implicit-booleaness-not-comparison-to-string',
+    'use-implicit-booleaness-not-comparison-to-zero',
+    'use-symbolic-message-instead',
+    'missing-module-docstring',
+    'missing-class-docstring',
+    'missing-function-docstring',
+    'invalid-name',
+    'too-many-locals',
+    'too-many-arguments',
+    'too-many-instance-attributes',
+    'too-many-public-methods',
+    'too-many-lines',
+    'too-many-statements',
+    'too-many-branches',
+    'too-many-nested-blocks',
+    'too-many-boolean-expressions',
+    'too-many-function-args',
+    'too-many-ancestors',
+    'W0102',
+    'R0903',
+]
+allow-reexport-from-package = true
