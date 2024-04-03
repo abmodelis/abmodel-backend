@@ -18,7 +18,6 @@ class CourseRepository(Repository[CourseIn, Course]):
         self.db.add(new_course)
         self.db.commit()
         self.db.refresh(new_course)
-        print(new_course)
         return TypeAdapter(Course).validate_python(new_course)
 
     def get_all(self):

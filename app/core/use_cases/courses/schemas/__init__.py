@@ -6,7 +6,7 @@ from app.core.domain import Status
 class CourseIn(BaseModel):
     title: str = Field(min_length=1, max_length=255, description="Titulo del curso", examples=["Python", "FastAPI"])
     description: str = Field(description="Descripcion del curso", examples=["Curso de Python", "Curso de FastAPI"])
-    price: int = Field(gt=0, description="Precio en centavos, ej: 10000 -> 100.00 bs", examples=[10000])
+    price: int = Field(ge=0, description="Precio ej: 100.00 bs", examples=[100])
     status: Status = Field(
         default=Status.NO_VISIBLE, description="Estado del curso, 0-No visible, 1-Visible", examples=[0, 1]
     )
