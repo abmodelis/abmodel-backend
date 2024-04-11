@@ -3,8 +3,9 @@ from http.client import BAD_REQUEST
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
+from app.api.dependencies.upload_image_use_case import CloudUploadImage
+
 from ..dependencies.jwt import CurrenUserDependency
-from ..infrastructure.cloudinary_adapter import CloudinaryAdapter
 
 router = APIRouter()
 
@@ -19,10 +20,10 @@ class ImagesUrl(BaseModel):
 
 
 @router.post("/images", dependencies=[CurrenUserDependency])
-def upload_images(file: UploadFile = File(...), cloudinary_adapter: CloudinaryAdapter = Depends()) -> ImagesUrl:
+def upload_images(file: UploadFile = File(...), upload_image: CloudUploadImage = Depends()) -> ImagesUrl:
     if not file:
         raise HTTPException(status_code=BAD_REQUEST, detail="No file")
     if not (file.content_type or "").startswith("image"):
         raise HTTPException(status_code=BAD_REQUEST, detail="Not an image")
-    url = cloudinary_adapter.upload(file.file)
+    url = upload_image(file.file)
     return ImagesUrl(image_url=url)

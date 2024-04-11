@@ -22,4 +22,12 @@ class CourseDB(Base):
     # owner: Column[]
 
     def __repr__(self):
-        return f"<Course(id={self.id}, title={self.title}, description={self.description}, status={self.status}, price={self.price}, image_path={self.image_path}, created_at={self.created_at}, updated_at={self.updated_at}, deleted_at={self.deleted_at})>"
+        return f"<Course(id={self.id},\n\
+                       \ttitle={self.title},\n\
+                       \tdescription={self.description},\n\
+                       \tstatus={self.status},\n\
+                       \tprice={self.price},\n\
+                       \timage_path={self.image_path},\n\
+                       \tcreated_at={self.created_at},\n\
+                       \tupdated_at={self.updated_at},\n\
+                       \tdeleted_at={self.deleted_at})>"

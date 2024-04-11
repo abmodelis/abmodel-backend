@@ -32,6 +32,14 @@ class Repository(ABC, Generic[EntityIn, Entity]):
 
     @overload
     @abstractmethod
+    def soft_delete(self, entity_id: int) -> Optional[Entity]: ...
+
+    @overload
+    @abstractmethod
+    def soft_delete(self, entity_id: UUID) -> Optional[Entity]: ...
+
+    @overload
+    @abstractmethod
     def update(self, entity: EntityIn) -> Optional[Entity]: ...
 
     @overload
