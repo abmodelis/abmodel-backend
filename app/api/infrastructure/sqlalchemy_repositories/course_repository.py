@@ -1,15 +1,15 @@
+from datetime import UTC, datetime
+
 from fastapi import Depends
-from pydantic import TypeAdapter
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.get_db import get_db
 from app.core.domain import Repository
-from app.core.domain.course import Course
 from app.core.use_cases.courses.schemas import CourseIn
 from app.databases.sqlalchemy_connection.models.course_db import CourseDB
 
 
-class CourseRepository(Repository[CourseIn, Course]):
+class CourseRepository(Repository[CourseIn, CourseDB]):
     def __init__(self, db: Session = Depends(get_db)) -> None:
         self.db = db
 
@@ -18,20 +18,24 @@ class CourseRepository(Repository[CourseIn, Course]):
         self.db.add(new_course)
         self.db.commit()
         self.db.refresh(new_course)
-        return TypeAdapter(Course).validate_python(new_course)
+        return new_course
 
     def get_all(self):
-        courses = self.db.query(CourseDB).all()
-        return TypeAdapter(list[Course]).validate_python(courses)
+        return self.db.query(CourseDB).all()
 
     def get_by_id(self, entity_id):
-        raise NotImplementedError
+        course = self.db.query(CourseDB).filter_by(id=entity_id, deleted_at=None).first()
+        return course
 
-    def delete(self, entity_id):
-        raise NotImplementedError
+    def update(self, entity: CourseDB):
+        self.db.merge(entity)
+        self.db.commit()
+        self.db.refresh(entity)
+        return entity
 
-    def update(self, entity):
-        raise NotImplementedError
-
-    def update_by_id(self, entity_id, entity):
-        raise NotImplementedError
+    def soft_delete(self, entity: CourseDB):
+        entity.deleted_at = datetime.now(UTC)
+        self.db.merge(entity)
+        self.db.commit()
+        self.db.refresh(entity)
+        return entity

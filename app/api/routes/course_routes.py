@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.domain.course import Course
 from app.core.use_cases.courses.schemas import CourseIn
@@ -9,12 +9,35 @@ from ..dependencies.jwt import CurrenUserDependency
 router = APIRouter()
 
 
-@router.post("/", dependencies=[CurrenUserDependency])
-def create_course(course_in: CourseIn, crud: SQLCoursesCrud = Depends()) -> Course:
-    course_in.price = int(course_in.price * 100)  # Convert to cents
+@router.post("/", dependencies=[CurrenUserDependency], response_model=Course)
+def create_course(course_in: CourseIn, crud: SQLCoursesCrud = Depends()):
     return crud.create(course_in)
 
 
-@router.get("/", dependencies=[CurrenUserDependency])
-def get_all_courses(crud: SQLCoursesCrud = Depends()) -> list[Course]:
+@router.get("/", dependencies=[CurrenUserDependency], response_model=list[Course])
+def get_all_courses(crud: SQLCoursesCrud = Depends()):
     return crud.get_all()
+
+
+@router.get("/{entity_id}", dependencies=[CurrenUserDependency], response_model=Course)
+def get_by_id(entity_id: int, crud: SQLCoursesCrud = Depends()):
+    course = crud.get_by_id(entity_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return course
+
+
+@router.put("/{entity_id}", dependencies=[CurrenUserDependency], response_model=Course)
+def update_by_id(entity_id: int, course_in: CourseIn, crud: SQLCoursesCrud = Depends()):
+    course = crud.update(entity_id, course_in)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return course
+
+
+@router.delete("/{entity_id}", dependencies=[CurrenUserDependency], response_model=Course)
+def delete_by_id(entity_id: int, crud: SQLCoursesCrud = Depends()):
+    course = crud.soft_delete(entity_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return course
