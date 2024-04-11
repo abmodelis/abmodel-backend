@@ -1,6 +1,7 @@
-from datetime import UTC, datetime
+from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Enum, Integer, String, Text
+from sqlalchemy import DateTime, Enum, Integer, String, Text, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.domain.course import Status
 from app.databases.sqlalchemy_connection.base import Base
@@ -9,15 +10,15 @@ from app.databases.sqlalchemy_connection.base import Base
 class CourseDB(Base):
     __tablename__ = "courses"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255))
-    description = Column(Text)
-    status = Column(Enum(Status), default=Status.NO_VISIBLE)
-    price = Column(Integer)
-    image_path = Column(String(255))
-    created_at = Column(DateTime, default=datetime.now(UTC), nullable=False)
-    updated_at = Column(DateTime, default=datetime.now(UTC), nullable=False, onupdate=datetime.now(UTC))
-    deleted_at = Column(DateTime, default=None, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Enum(Status), default=Status.NO_VISIBLE)
+    price: Mapped[int] = mapped_column(Integer)
+    image_path: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
+    deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # owner: Column[]
 
