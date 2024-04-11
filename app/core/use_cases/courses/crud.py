@@ -13,3 +13,10 @@ class CoursesCrud:
 
     def get_all(self) -> list[Course]:
         return self.repository.get_all()
+
+    def get_by_id(self, entity_id: int) -> Course | None:
+        course = self.repository.get_by_id(entity_id)
+        if course is None:
+            return None
+        course.price = int(course.price / 100) # convert to bolivianos
+        return course

@@ -7,6 +7,7 @@ certifi==2024.2.2
 cffi==1.16.0
 click==8.1.7
 cloudinary==1.39.1
+colorama==0.4.6
 cryptography==42.0.5
 decorator==5.1.1
 dill==0.3.8
@@ -24,6 +25,7 @@ passlib==1.7.4
 pbr==6.0.0
 platformdirs==4.2.0
 psycopg==3.1.18
+psycopg-binary==3.1.18
 pyasn1==0.6.0
 pycparser==2.22
 pydantic==2.6.4
@@ -43,8 +45,8 @@ starlette==0.36.3
 Tempita==0.5.2
 tomlkit==0.12.4
 typing_extensions==4.10.0
+tzdata==2024.1
 urllib3==2.2.1
 uvicorn==0.29.0
-uvloop==0.19.0
 watchfiles==0.21.0
 websockets==12.0

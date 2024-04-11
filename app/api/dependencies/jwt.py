@@ -1,15 +1,16 @@
-import os
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from jose import JWTError, jwt, ExpiredSignatureError
 
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-ALGORITHM = os.getenv("ALGORITHM", "")
+from app.env import Env
+
+SECRET_KEY = Env.SECRET_KEY
+ALGORITHM = Env.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
@@ -18,7 +19,7 @@ fake_users_db = {
         "username": "johndoe",
         "full_name": "John Doe",
         "email": "johndoe@example.com",
-        "hashed_password": os.getenv("FAKE_PASSWORD"),
+        "hashed_password": Env.FAKE_PASSWORD,
         "disabled": False,
     }
 }
@@ -57,10 +58,11 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+def get_user(db, username: str) -> UserInDB | None:
+    if not username in db:
+        return None
+    user_dict = db[username]
+    return UserInDB(**user_dict)
 
 
 def authenticate_user(fake_db, username: str, password: str):
@@ -81,6 +83,12 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def create_refresh_token(data: dict):
+    to_encode = data.copy()
+    refresh_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return refresh_jwt
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):

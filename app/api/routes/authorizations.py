@@ -6,8 +6,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..dependencies.jwt import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
-    CurrenUserDependency,
-    CurrentUser,
     Token,
     authenticate_user,
     create_access_token,
@@ -19,6 +17,16 @@ router = APIRouter()
 
 @router.post("/login", response_model=Token)
 def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+    """Login for access token and refresh token
+
+    Args:
+        form_data (OAuth2PasswordRequestForm): OAuth2PasswordRequestForm
+    Returns:
+        Token: Token
+    Raises:
+        HTTPException: HTTPException
+    """
+
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -29,13 +37,3 @@ def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return Token(access_token=access_token, token_type="bearer")
-
-
-@router.get("/users/me")
-def read_users_me(current_user: CurrentUser):
-    return current_user
-
-
-@router.get("/test", dependencies=[CurrenUserDependency])
-def test():
-    return "test"
