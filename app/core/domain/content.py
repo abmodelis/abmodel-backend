@@ -3,8 +3,6 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from .unit import Unit
-
 
 class Content(BaseModel):
     id: int
@@ -13,4 +11,7 @@ class Content(BaseModel):
     media_path: str
     created_at: datetime
     updated_at: datetime
-    unit: Optional[Unit]
+    unit: Optional["Unit"]
+
+
+from .unit import Unit
