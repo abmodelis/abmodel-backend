@@ -9,10 +9,9 @@ class Unit(BaseModel):
     title: str
     course_id: int
     course: Optional["Course"]
-    content: Optional[list["Content"]]
+    # content: Optional[list["Content"]]
     created_at: datetime
     updated_at: datetime
 
 
-from .content import Content
 from .course import Course

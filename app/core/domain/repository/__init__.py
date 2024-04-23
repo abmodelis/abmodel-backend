@@ -14,6 +14,9 @@ class Repository(ABC, Generic[EntityIn, EntityDB]):
     @abstractmethod
     def create(self, entity: EntityIn) -> EntityDB: ...
 
+    @abstractmethod
+    def save(self, entity: EntityDB) -> EntityDB: ...
+
     @overload
     @abstractmethod
     def get_by_id(self, entity_id: int) -> Optional[EntityDB]: ...
@@ -21,6 +24,10 @@ class Repository(ABC, Generic[EntityIn, EntityDB]):
     @overload
     @abstractmethod
     def get_by_id(self, entity_id: UUID) -> Optional[EntityDB]: ...
+
+    @overload
+    @abstractmethod
+    def delete(self, entity: EntityDB) -> Optional[EntityDB]: ...
 
     @overload
     @abstractmethod

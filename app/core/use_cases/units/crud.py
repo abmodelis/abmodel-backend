@@ -17,7 +17,15 @@ class UnitCrud:
         return self.repository.get_by_id(entity_id)
 
     def update(self, entity_id: int, unit_in: UnitIn):
-        return self.repository.update(entity_id, unit_in)
+        unit = self.get_by_id(entity_id)
+        if not unit:
+            return None
+        for key, value in unit_in.model_dump().items():
+            setattr(unit, key, value)
+        return self.repository.save(unit)
 
     def delete(self, entity_id: int):
-        return self.repository.delete(entity_id)
+        units = self.get_by_id(entity_id)
+        if not units:
+            return None
+        return self.repository.delete(units)
