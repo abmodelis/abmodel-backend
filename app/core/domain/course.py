@@ -20,9 +20,13 @@ class Course(BaseModel):
     status: Status
     price: int
     image_path: str
+    units: Optional[list["Unit"]]
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime]
     # owner: Optional[User]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+from .unit import Unit

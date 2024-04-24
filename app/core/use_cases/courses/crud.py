@@ -1,11 +1,11 @@
+from app.core.domain.course import Course
 from app.core.domain.repository import Repository
-from app.databases.sqlalchemy_connection.models.course_db import CourseDB
 
 from .schemas import CourseIn
 
 
 class CoursesCrud:
-    def __init__(self, repository: Repository[CourseIn, CourseDB]) -> None:
+    def __init__(self, repository: Repository[CourseIn, Course]) -> None:
         self.repository = repository
 
     def create(self, course_in: CourseIn):
