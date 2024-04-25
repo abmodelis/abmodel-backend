@@ -20,7 +20,7 @@ class ImagesUrl(BaseModel):
 
 
 @router.post("/images", dependencies=[CurrenUserDependency])
-def upload_images(file: UploadFile = File(...), upload_image: CloudUploadImage = Depends()) -> ImagesUrl:
+async def upload_images(file: UploadFile = File(...), upload_image: CloudUploadImage = Depends()) -> ImagesUrl:
     if not file:
         raise HTTPException(status_code=BAD_REQUEST, detail="No file")
     if not (file.content_type or "").startswith("image"):

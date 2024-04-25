@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
-def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     """Login for access token and refresh token
 
     Args:
