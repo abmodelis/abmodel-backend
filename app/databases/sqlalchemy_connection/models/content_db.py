@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -14,7 +15,8 @@ class ContentDb(Base):
     html_text: Mapped[str] = mapped_column(Text)
     media_path: Mapped[str] = mapped_column(String(255))
     unit_id: Mapped[int] = mapped_column(ForeignKey("units.id"))
-    unit: Mapped["UnitDB"] = relationship(back_populates="contents")
+    unit: Mapped[Optional["UnitDB"]] = relationship(back_populates="contents", lazy="noload")
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
 

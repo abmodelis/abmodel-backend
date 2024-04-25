@@ -16,7 +16,15 @@ class ContentCrud:
         return self.repository.get_by_id(entity_id)
 
     def update(self, entity_id: int, content_in: ContentIn):
-        return self.repository.update(entity_id, content_in)
+        content = self.get_by_id(entity_id)
+        if not content:
+            return None
+        for key, value in content_in.model_dump().items():
+            setattr(content, key, value)
+        return self.repository.save(content)
 
     def delete(self, entity_id: int):
-        return self.repository.delete(entity_id)
+        content = self.get_by_id(entity_id)
+        if not content:
+            return None
+        return self.repository.delete(content)
