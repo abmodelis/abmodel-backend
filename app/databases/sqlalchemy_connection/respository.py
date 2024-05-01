@@ -42,8 +42,11 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
     def get_by_id(self, entity_id: int) -> Optional[EntityDB]:
         return self.session.query(self.Model).get(entity_id)
 
-    def get_all(self) -> list[EntityDB]:
-        entities = self.session.query(self.Model).all()
+    def get_all(self, query_params: Optional[BaseModel] = None) -> list[EntityDB]:
+        query = self.session.query(self.Model)
+        if query_params:
+            query = query.filter_by(**query_params.model_dump(exclude_none=True))
+        entities = query.all()
         return entities
 
     def delete(self, entity: EntityDB) -> Optional[EntityDB]:

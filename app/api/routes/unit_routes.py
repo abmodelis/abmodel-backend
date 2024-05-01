@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.api.dependencies.jwt import CurrenUserDependency
 from app.api.dependencies.units_use_cases import SQLUnitCrud
 from app.core.domain.unit import Unit
-from app.core.use_cases.units.schemas import UnitIn
+from app.core.use_cases.units.schemas import UnitIn, UnitQueryParams
 
 router = APIRouter()
 
@@ -14,8 +14,8 @@ async def create_unit(unit_in: UnitIn, crud: SQLUnitCrud = Depends()):
 
 
 @router.get("/", dependencies=[CurrenUserDependency], response_model=list[Unit])
-async def get_all_units(crud: SQLUnitCrud = Depends()):
-    return crud.get_all()
+async def get_all_units(query: UnitQueryParams = Depends(), crud: SQLUnitCrud = Depends()):
+    return crud.get_all(query)
 
 
 @router.put("/{entity_id}", dependencies=[CurrenUserDependency], response_model=Unit)

@@ -14,17 +14,6 @@ ALGORITHM = Env.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": Env.FAKE_PASSWORD,
-        "disabled": False,
-    }
-}
-
-
 # Fake Models to test JWT
 class Token(BaseModel):
     access_token: str
@@ -48,6 +37,15 @@ class UserInDB(User):
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": pwd_context.hash(Env.FAKE_PASSWORD),
+        "disabled": False,
+    }
+}
 
 
 def verify_password(plain_password, hashed_password):

@@ -17,7 +17,7 @@ class CourseDB(Base):
     status: Mapped[str] = mapped_column(Enum(Status), default=Status.NO_VISIBLE)
     price: Mapped[int] = mapped_column(Integer)
     image_path: Mapped[str] = mapped_column(String(255))
-    units: Mapped[Optional[list["UnitDB"]]] = relationship(back_populates="course", lazy="noload")
+    units: Mapped[Optional[list["UnitDB"]]] = relationship(back_populates="course")
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
