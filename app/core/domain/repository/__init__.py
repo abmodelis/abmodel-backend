@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Generic, Optional, TypeVar, overload
 from uuid import UUID
 
+from pydantic import BaseModel
+
 EntityIn = TypeVar("EntityIn")
 EntityDB = TypeVar("EntityDB")
 
@@ -9,7 +11,7 @@ EntityDB = TypeVar("EntityDB")
 class Repository(ABC, Generic[EntityIn, EntityDB]):
 
     @abstractmethod
-    def get_all(self) -> list[EntityDB]: ...
+    def get_all(self, query_params: Optional[BaseModel] = None) -> list[EntityDB]: ...
 
     @abstractmethod
     def create(self, entity: EntityIn) -> EntityDB: ...

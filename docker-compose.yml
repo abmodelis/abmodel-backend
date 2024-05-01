@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mydb
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - unflipnet
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    ports:
+      - 80:80
+    depends_on:
+      - postgres
+    networks:
+      - unflipnet
+
+volumes:
+  postgres_data:
+
+
+networks:
+  unflipnet:

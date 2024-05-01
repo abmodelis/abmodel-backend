@@ -1,6 +1,7 @@
 from app.core.domain import Unit
 from app.core.domain.repository import Repository
-from app.core.use_cases.units.schemas import UnitIn
+
+from .schemas import UnitIn, UnitQueryParams
 
 
 class UnitCrud:
@@ -10,8 +11,8 @@ class UnitCrud:
     def create(self, unit_in: UnitIn):
         return self.repository.create(unit_in)
 
-    def get_all(self):
-        return self.repository.get_all()
+    def get_all(self, query: UnitQueryParams):
+        return self.repository.get_all(query)
 
     def get_by_id(self, entity_id: int):
         return self.repository.get_by_id(entity_id)
