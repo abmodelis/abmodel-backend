@@ -27,6 +27,22 @@ services:
     networks:
       - unflipnet
 
+  server:
+    container_name: server
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    env_file: .env
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    networks:
+      - unflipnet
+
 volumes:
   postgres_data:
 
