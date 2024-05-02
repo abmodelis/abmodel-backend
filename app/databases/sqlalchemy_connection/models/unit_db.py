@@ -14,7 +14,9 @@ class UnitDB(Base):
     title: Mapped[str] = mapped_column(String(255))
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
     course: Mapped[Optional["CourseDB"]] = relationship(back_populates="units", lazy="noload")
-    contents: Mapped[Optional[list["ContentDb"]]] = relationship(back_populates="unit", lazy="noload")
+    contents: Mapped[Optional[list["ContentDb"]]] = relationship(
+        back_populates="unit",
+    )
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.CURRENT_TIMESTAMP())
