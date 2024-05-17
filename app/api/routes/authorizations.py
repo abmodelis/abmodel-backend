@@ -1,16 +1,20 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import SecretStr
+from sqlalchemy.exc import IntegrityError
 
-from ..dependencies.jwt import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    Token,
-    authenticate_user,
-    create_access_token,
-    fake_users_db,
-)
+from app.core.domain import TokenDict, User
+from app.core.use_cases.auth.schemas import UserIn, UserLogin
+
+from ..dependencies.api_security_service import ApiSecurityService
+from ..dependencies.api_signin import APISignIn
+from ..dependencies.api_signup import APISignUp
+from ..dependencies.jwt import (ACCESS_TOKEN_EXPIRE_MINUTES, Token,
+                                authenticate_user, create_access_token,
+                                fake_users_db)
 
 router = APIRouter()
 
@@ -37,3 +41,47 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.post("/signup", response_model=User)
+async def signup(user_in: UserIn, api_signup: APISignUp = Depends()):
+    try:
+        return api_signup(user_in)
+    except IntegrityError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=409, detail=repr(error)) from error
+
+
+@router.post("/signin", response_model=TokenDict)
+async def signin(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    security_service: Annotated[ApiSecurityService, Depends()],
+    api_signin: Annotated[APISignIn, Depends()],
+) -> TokenDict:
+    user_login = UserLogin(
+        email=form_data.username,
+        password=SecretStr(form_data.password),
+    )
+    user = api_signin(user_login)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return security_service(user.uuid)
+
+
+@router.post("/refresh")
+async def refresh_token(
+    authorization: Annotated[str, Header()], security_service: Annotated[ApiSecurityService, Depends()]
+):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Refresh token not found")
+    refreshed_token = authorization.split(" ")[1]
+    new_token = security_service.refresh(refreshed_token)
+    if not new_token:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+    return new_token

@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
-from typing import Optional, TypeVar
+from typing import Optional, TypeVar, Union
+from uuid import UUID
 
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -7,7 +8,7 @@ from sqlalchemy.orm.decl_api import DeclarativeAttributeIntercept
 
 from app.core.domain import Repository
 
-EntityIn = TypeVar("EntityIn")
+EntityIn = TypeVar("EntityIn", bound=BaseModel)
 EntityDB = TypeVar("EntityDB")
 
 
@@ -33,13 +34,30 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
         self.session.refresh(entity)
         return entity
 
-    def update(self, entity: EntityDB) -> Optional[EntityDB]:
-        self.session.merge(entity)
-        self.session.commit()
-        self.session.refresh(entity)
-        return entity
+    def update(self, entity: Union[EntityDB, int, UUID], entity_data: Optional[EntityIn] = None) -> Optional[EntityDB]:
+        if isinstance(entity, (int, UUID)):
+            entity_db = self.get_by_id(entity)
+        elif isinstance(entity, self.Model):
+            entity_db = entity
+        else:
+            return None
 
-    def get_by_id(self, entity_id: int) -> Optional[EntityDB]:
+        if entity_db is None:
+            return None
+
+        if entity_data:
+            for key, value in entity_data.model_dump().items():
+                setattr(entity_db, key, value)
+
+        self.session.merge(entity_db)
+        self.session.commit()
+        self.session.refresh(entity_db)
+        return entity_db
+
+    def get_by(self, *args, **kwargs) -> Optional[EntityDB]:
+        return self.session.query(self.Model).filter_by(*args, **kwargs).first()
+
+    def get_by_id(self, entity_id: int | UUID) -> Optional[EntityDB]:
         return self.session.query(self.Model).get(entity_id)
 
     def get_all(self, query_params: Optional[BaseModel] = None) -> list[EntityDB]:
@@ -49,14 +67,30 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
         entities = query.all()
         return entities
 
-    def delete(self, entity: EntityDB) -> Optional[EntityDB]:
-        self.session.delete(entity)
-        self.session.commit()
-        return entity
+    def delete(self, entity: EntityDB | int | UUID) -> Optional[EntityDB]:
+        if isinstance(entity, (int, UUID)):
+            entity_db = self.get_by_id(entity)
+        elif isinstance(entity, self.Model):
+            entity_db = entity
 
-    def soft_delete(self, entity: EntityDB) -> Optional[EntityDB]:
-        entity.deleted_at = datetime.now(UTC)  # type: ignore
-        self.session.merge(entity)
+        if entity_db is None:
+            return None
+
+        self.session.delete(entity_db)
         self.session.commit()
-        self.session.refresh(entity)
-        return entity
+        return entity_db
+
+    def soft_delete(self, entity: EntityDB | int | UUID) -> Optional[EntityDB]:
+        if isinstance(entity, (int, UUID)):
+            entity_db = self.get_by_id(entity)
+        elif isinstance(entity, self.Model):
+            entity_db = entity
+
+        if entity_db is None:
+            return None
+
+        entity_db.deleted_at = datetime.now(UTC)  # type: ignore
+        self.session.merge(entity_db)
+        self.session.commit()
+        self.session.refresh(entity_db)
+        return entity_db

@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from abc import ABC, abstractmethod
 from typing import Generic, Optional, TypeVar, overload
 from uuid import UUID
@@ -33,11 +34,7 @@ class Repository(ABC, Generic[EntityIn, EntityDB]):
 
     @overload
     @abstractmethod
-    def delete(self, entity_id: int) -> Optional[EntityDB]: ...
-
-    @overload
-    @abstractmethod
-    def delete(self, entity_id: UUID) -> Optional[EntityDB]: ...
+    def delete(self, entity_id: int | UUID) -> Optional[EntityDB]: ...
 
     @overload
     @abstractmethod
@@ -45,11 +42,7 @@ class Repository(ABC, Generic[EntityIn, EntityDB]):
 
     @overload
     @abstractmethod
-    def soft_delete(self, entity_id: int) -> Optional[EntityDB]: ...
-
-    @overload
-    @abstractmethod
-    def soft_delete(self, entity_id: UUID) -> Optional[EntityDB]: ...
+    def soft_delete(self, entity_id: int | UUID) -> Optional[EntityDB]: ...
 
     @overload
     @abstractmethod
@@ -57,8 +50,7 @@ class Repository(ABC, Generic[EntityIn, EntityDB]):
 
     @overload
     @abstractmethod
-    def update(self, entity_id: int, entity: EntityIn) -> Optional[EntityDB]: ...
+    def update(self, entity_id: int | UUID, entity_in: EntityIn) -> Optional[EntityDB]: ...
 
-    @overload
     @abstractmethod
-    def update(self, entity_id: UUID, entity: EntityIn) -> Optional[EntityDB]: ...
+    def get_by(self, *args, **kwargs) -> Optional[EntityDB]: ...

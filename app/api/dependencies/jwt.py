@@ -1,3 +1,7 @@
+"""
+@deprecated
+"""
+
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -35,7 +39,7 @@ class UserInDB(User):
     hashed_password: str
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 fake_users_db = {
     "johndoe": {
