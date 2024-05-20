@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 from typing import Annotated
 
@@ -48,7 +49,9 @@ async def signup(user_in: UserIn, api_signup: APISignUp = Depends()):
     try:
         return api_signup(user_in)
     except IntegrityError as error:
-        raise HTTPException(status_code=400, detail=str(error)) from error
+        error_message = re.findall(r"DETAIL:  (.*)", str(error))[0]
+        error_message = re.sub(r"Key \((.*)\)=\(", "", error_message).replace(")", "")
+        raise HTTPException(status_code=400, detail=error_message) from error
     except Exception as error:
         raise HTTPException(status_code=409, detail=repr(error)) from error
 
@@ -74,14 +77,15 @@ async def signin(
     return security_service(user.uuid)
 
 
-@router.post("/refresh")
+@router.get("/refresh")
 async def refresh_token(
-    authorization: Annotated[str, Header()], security_service: Annotated[ApiSecurityService, Depends()]
+    Authorization: Annotated[str | None, Header()],
+    security_service: Annotated[ApiSecurityService, Depends()],
 ):
-    if not authorization.startswith("Bearer "):
+    if Authorization is None or not Authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Refresh token not found")
-    refreshed_token = authorization.split(" ")[1]
+    refreshed_token = Authorization.split(" ")[1]
     new_token = security_service.refresh(refreshed_token)
     if not new_token:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
-    return new_token
+    return {"access_token": new_token}
