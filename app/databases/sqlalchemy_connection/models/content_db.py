@@ -11,6 +11,7 @@ class ContentDb(Base):
     __tablename__ = "contents"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
+    title: Mapped[str] = mapped_column(String(255))
     html_text: Mapped[str] = mapped_column(Text)
     media_path: Mapped[str] = mapped_column(String(255))
     unit_id: Mapped[int] = mapped_column(ForeignKey("units.id"))
@@ -21,6 +22,7 @@ class ContentDb(Base):
 
     def __repr__(self):
         return f"<Content(id={self.id},\n\
+                   \ttitle={self.title},\n\
                    \thtml_text={self.html_text},\n\
                    \tmedia_path={self.media_path},\n\
                    \tunit_id={self.unit_id},\n\
