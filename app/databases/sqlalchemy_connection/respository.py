@@ -62,6 +62,10 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
 
     def get_all(self, query_params: Optional[BaseModel] = None) -> list[EntityDB]:
         query = self.session.query(self.Model)
+        if hasattr(self.Model, "deleted_at") and not hasattr(query_params, "deleted_at"):
+            query = query.filter_by(deleted_at=None)
+        else:
+            del query_params.deleted_at  # type: ignore
         if query_params:
             query = query.filter_by(**query_params.model_dump(exclude_none=True))
         entities = query.all()
