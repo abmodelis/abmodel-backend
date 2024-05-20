@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, Field
 
 
 class Role(Enum):
@@ -25,4 +25,4 @@ class User(BaseModel):
     specialization_area: Optional[SpecializationArea]
     email: str
     role: Optional[Role] = Field(None)  # TODO: Remove Optional when roles will be implemented
-    hashed_password: SecretStr = Field(exclude=True)
+    hashed_password: str = Field(exclude=True)

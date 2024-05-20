@@ -18,7 +18,7 @@ class SignIn:
         pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
         if not pwd_context.verify(
             user_login.password.get_secret_value(),
-            user.hashed_password.get_secret_value(),
+            user.hashed_password,
         ):
             return None
         return user
