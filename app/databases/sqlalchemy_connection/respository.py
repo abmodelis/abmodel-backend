@@ -46,6 +46,8 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
             return None
 
         if entity_data:
+            if hasattr(entity_data, "restore") and getattr(entity_data, "restore", False):
+                setattr(entity_db, "deleted_at", None)
             for key, value in entity_data.model_dump().items():
                 setattr(entity_db, key, value)
 
@@ -62,22 +64,29 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
 
     def get_all(self, query_params: Optional[BaseModel] = None) -> list[EntityDB]:
         query = self.session.query(self.Model)
-        if hasattr(self.Model, "deleted_at") and not hasattr(query_params, "deleted_at"):
-            query = query.filter_by(deleted_at=None)
-        else:
-            del query_params.deleted_at  # type: ignore
-        if query_params:
-            query = query.filter_by(**query_params.model_dump(exclude_none=True))
-        entities = query.all()
-        return entities
+
+        if not query_params:
+            return query.all()
+
+        query = query.filter_by(**query_params.model_dump(exclude_none=True))
+        archived = getattr(query_params, "archived", False)
+
+        if not hasattr(self.Model, "deleted_at"):
+            return query.all()
+
+        if archived:
+            query = query.filter(self.Model.deleted_at.isnot(None))  # type: ignore
+            return query.all()
+
+        query = query.filter_by(deleted_at=None)
+        return query.all()
 
     def delete(self, entity: EntityDB | int | UUID) -> Optional[EntityDB]:
         if isinstance(entity, (int, UUID)):
             entity_db = self.get_by_id(entity)
         elif isinstance(entity, self.Model):
             entity_db = entity
-
-        if entity_db is None:
+        else:
             return None
 
         self.session.delete(entity_db)
@@ -89,8 +98,7 @@ class SQLARepository(Repository[EntityIn, EntityDB]):
             entity_db = self.get_by_id(entity)
         elif isinstance(entity, self.Model):
             entity_db = entity
-
-        if entity_db is None:
+        else:
             return None
 
         entity_db.deleted_at = datetime.now(UTC)  # type: ignore

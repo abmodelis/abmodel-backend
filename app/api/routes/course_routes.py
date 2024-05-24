@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.domain.course import Course
-from app.core.use_cases.courses.schemas import CourseIn
+from app.core.use_cases.courses.schemas import CourseIn, CourseQueryParams
 
 from ..dependencies.course_use_cases import SQLCoursesCrud
 from ..dependencies.jwt import CurrenUserDependency
@@ -15,8 +15,8 @@ async def create_course(course_in: CourseIn, crud: SQLCoursesCrud = Depends()):
 
 
 @router.get("/", dependencies=[CurrenUserDependency], response_model=list[Course])
-async def get_all_courses(crud: SQLCoursesCrud = Depends()):
-    return crud.get_all()
+async def get_all_courses(query_params: CourseQueryParams = Depends(), crud: SQLCoursesCrud = Depends()):
+    return crud.get_all(query_params)
 
 
 @router.get("/{entity_id}", dependencies=[CurrenUserDependency], response_model=Course)
