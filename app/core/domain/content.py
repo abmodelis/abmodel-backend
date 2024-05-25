@@ -10,3 +10,4 @@ class Content(BaseModel):
     media_path: str
     created_at: datetime
     updated_at: datetime
+    unit_id: int
