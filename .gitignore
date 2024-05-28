@@ -1,6 +1,8 @@
 # enviroment
 .env
-
+env
+abmodelis
+.venv
 
 # python cache
 __pycache__

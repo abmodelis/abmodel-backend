@@ -1,9 +1,6 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
-
-from .unit import Unit
 
 
 class Content(BaseModel):
@@ -13,4 +10,4 @@ class Content(BaseModel):
     media_path: str
     created_at: datetime
     updated_at: datetime
-    unit: Optional[Unit]
+    unit_id: int

@@ -1,7 +1,9 @@
+from datetime import date
 from enum import Enum
+from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Role(Enum):
@@ -10,9 +12,17 @@ class Role(Enum):
     STUDENT = 2
 
 
+class SpecializationArea(BaseModel):
+    id: int
+    title: str
+
+
 class User(BaseModel):
     uuid: UUID
     first_name: str
     last_name: str
+    birth_date: date
+    specialization_area: Optional[SpecializationArea]
     email: str
-    role: Role
+    role: Optional[Role] = Field(None)  # TODO: Remove Optional when roles will be implemented
+    hashed_password: str = Field(exclude=True)
